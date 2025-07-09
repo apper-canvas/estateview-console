@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, RotateCw, Maximize2, X, Info } from 'lucide-react';
-import { Button } from '@/components/atoms/Button';
+import Button from '@/components/atoms/Button';
 
-const VirtualTourViewer = ({ 
+const VirtualTourViewer = ({
   images = [], 
   hotspots = [], 
   initialImageIndex = 0,
