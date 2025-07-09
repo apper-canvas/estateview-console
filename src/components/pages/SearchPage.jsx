@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import PropertyGrid from "@/components/organisms/PropertyGrid";
+import ComparisonTable from "@/components/organisms/ComparisonTable";
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
 import Loading from "@/components/ui/Loading";
@@ -15,6 +17,8 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [comparisonIds, setComparisonIds] = useState([]);
+  const [comparisonProperties, setComparisonProperties] = useState([]);
   const navigate = useNavigate();
 
   const query = searchParams.get("q") || "";
@@ -63,6 +67,33 @@ const SearchPage = () => {
       }
     });
     setProperties(sorted);
+};
+
+  const handleComparisonToggle = async (propertyId) => {
+    if (comparisonIds.includes(propertyId)) {
+      // Remove from comparison
+      setComparisonIds(prev => prev.filter(id => id !== propertyId));
+      setComparisonProperties(prev => prev.filter(p => p.Id !== propertyId));
+    } else {
+      // Add to comparison (max 4 properties)
+      if (comparisonIds.length >= 4) {
+        toast.error("You can compare up to 4 properties at a time");
+        return;
+      }
+      
+      try {
+        const property = await propertyService.getById(propertyId);
+        setComparisonIds(prev => [...prev, propertyId]);
+        setComparisonProperties(prev => [...prev, property]);
+      } catch (error) {
+        toast.error("Error adding property to comparison");
+      }
+    }
+  };
+
+  const handleRemoveFromComparison = (propertyId) => {
+    setComparisonIds(prev => prev.filter(id => id !== propertyId));
+    setComparisonProperties(prev => prev.filter(p => p.Id !== propertyId));
   };
 
   const clearSearch = () => {
@@ -78,7 +109,7 @@ const SearchPage = () => {
     }
   }, [query]);
 
-  return (
+return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-primary mb-2">
@@ -95,6 +126,11 @@ const SearchPage = () => {
           />
         </div>
       </div>
+
+      <ComparisonTable 
+        properties={comparisonProperties}
+        onRemove={handleRemoveFromComparison}
+      />
 
       {query && (
         <div className="mb-6">
@@ -164,7 +200,11 @@ const SearchPage = () => {
             </div>
           </div>
           
-          <PropertyGrid properties={properties} />
+<PropertyGrid 
+            properties={properties} 
+            onComparisonToggle={handleComparisonToggle}
+            comparisonIds={comparisonIds}
+          />
         </div>
       )}
     </div>

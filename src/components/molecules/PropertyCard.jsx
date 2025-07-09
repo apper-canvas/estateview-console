@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import Button from "@/components/atoms/Button";
-import Badge from "@/components/atoms/Badge";
-import ApperIcon from "@/components/ApperIcon";
-import { propertyService } from "@/services/api/propertyService";
 import { cn } from "@/utils/cn";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import { propertyService } from "@/services/api/propertyService";
 
-const PropertyCard = ({ property, className }) => {
+const PropertyCard = ({ property, className, onComparisonToggle, isInComparison }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isComparisonLoading, setIsComparisonLoading] = useState(false);
 
   useEffect(() => {
     const checkFavoriteStatus = async () => {
@@ -44,9 +45,31 @@ const PropertyCard = ({ property, className }) => {
     } finally {
       setIsLoading(false);
     }
+}
   };
 
-  const formatPrice = (price) => {
+  const handleComparisonToggle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!onComparisonToggle) return;
+    
+    setIsComparisonLoading(true);
+    try {
+      await onComparisonToggle(property.Id);
+      if (isInComparison) {
+        toast.success("Removed from comparison");
+      } else {
+        toast.success("Added to comparison");
+      }
+    } catch (error) {
+      toast.error(error.message || "Error updating comparison");
+    } finally {
+      setIsComparisonLoading(false);
+    }
+  };
+
+const formatPrice = (price) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -65,7 +88,24 @@ const PropertyCard = ({ property, className }) => {
             className="w-full h-48 object-cover"
             loading="lazy"
           />
-          <div className="absolute top-3 right-3">
+<div className="absolute top-3 right-3 flex space-x-2">
+            {onComparisonToggle && (
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={handleComparisonToggle}
+                disabled={isComparisonLoading}
+                className="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-md"
+              >
+                <ApperIcon
+                  name={isInComparison ? "GitCompare" : "GitCompare"}
+                  className={cn(
+                    "h-5 w-5 transition-colors",
+                    isInComparison ? "text-accent" : "text-gray-600"
+                  )}
+                />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="small"

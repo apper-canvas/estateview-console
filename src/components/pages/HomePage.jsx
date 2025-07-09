@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import PropertyGrid from "@/components/organisms/PropertyGrid";
+import ComparisonTable from "@/components/organisms/ComparisonTable";
 import PropertyFilters from "@/components/organisms/PropertyFilters";
 import Button from "@/components/atoms/Button";
 import Loading from "@/components/ui/Loading";
@@ -16,6 +18,8 @@ const HomePage = () => {
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("newest");
+  const [comparisonIds, setComparisonIds] = useState([]);
+  const [comparisonProperties, setComparisonProperties] = useState([]);
   const navigate = useNavigate();
 
   const loadProperties = async () => {
@@ -67,6 +71,33 @@ const HomePage = () => {
       }
     });
     setFilteredProperties(sorted);
+};
+
+  const handleComparisonToggle = async (propertyId) => {
+    if (comparisonIds.includes(propertyId)) {
+      // Remove from comparison
+      setComparisonIds(prev => prev.filter(id => id !== propertyId));
+      setComparisonProperties(prev => prev.filter(p => p.Id !== propertyId));
+    } else {
+      // Add to comparison (max 4 properties)
+      if (comparisonIds.length >= 4) {
+        toast.error("You can compare up to 4 properties at a time");
+        return;
+      }
+      
+      try {
+        const property = await propertyService.getById(propertyId);
+        setComparisonIds(prev => [...prev, propertyId]);
+        setComparisonProperties(prev => [...prev, property]);
+      } catch (error) {
+        toast.error("Error adding property to comparison");
+      }
+    }
+  };
+
+  const handleRemoveFromComparison = (propertyId) => {
+    setComparisonIds(prev => prev.filter(id => id !== propertyId));
+    setComparisonProperties(prev => prev.filter(p => p.Id !== propertyId));
   };
 
   useEffect(() => {
@@ -97,7 +128,7 @@ const HomePage = () => {
     );
   }
 
-  return (
+return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-primary mb-2">
@@ -107,6 +138,11 @@ const HomePage = () => {
           Discover your dream home from our curated collection of premium properties
         </p>
       </div>
+
+      <ComparisonTable 
+        properties={comparisonProperties}
+        onRemove={handleRemoveFromComparison}
+      />
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
@@ -169,7 +205,11 @@ const HomePage = () => {
           )}
 
           {!error && filteredProperties.length > 0 && (
-            <PropertyGrid properties={filteredProperties} />
+<PropertyGrid 
+              properties={filteredProperties} 
+              onComparisonToggle={handleComparisonToggle}
+              comparisonIds={comparisonIds}
+            />
           )}
         </div>
       </div>
