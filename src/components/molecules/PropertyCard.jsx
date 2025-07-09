@@ -40,12 +40,11 @@ const PropertyCard = ({ property, className, onComparisonToggle, isInComparison 
         setIsFavorite(true);
         toast.success("Added to favorites");
       }
-    } catch (error) {
+} catch (error) {
       toast.error(error.message || "Error updating favorites");
     } finally {
       setIsLoading(false);
     }
-}
   };
 
   const handleComparisonToggle = async (e) => {
