@@ -84,8 +84,17 @@ export const propertyService = {
     return { success: true };
   },
 
-  async isFavorite(propertyId) {
+async isFavorite(propertyId) {
     await delay(100);
     return favorites.some(fav => fav.propertyId === parseInt(propertyId));
+  },
+
+  async getVirtualTour(propertyId) {
+    await delay(300);
+    const property = properties.find(p => p.Id === parseInt(propertyId));
+    if (!property || !property.virtualTour) {
+      throw new Error("Virtual tour not available for this property");
+    }
+    return { ...property.virtualTour };
   }
 };

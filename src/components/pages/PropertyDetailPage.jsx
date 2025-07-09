@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import Button from "@/components/atoms/Button";
-import Badge from "@/components/atoms/Badge";
-import ImageGallery from "@/components/molecules/ImageGallery";
-import PropertyMap from "@/components/molecules/PropertyMap";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
+import VirtualTourViewer from "@/components/molecules/VirtualTourViewer";
 import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import PropertyMap from "@/components/molecules/PropertyMap";
+import ImageGallery from "@/components/molecules/ImageGallery";
 import { propertyService } from "@/services/api/propertyService";
-
 const PropertyDetailPage = () => {
-  const { id } = useParams();
+const { id } = useParams();
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
+  const [virtualTour, setVirtualTour] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
-  const [favoriteLoading, setFavoriteLoading] = useState(false);
+const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   const loadProperty = async () => {
     try {
@@ -25,6 +26,15 @@ const PropertyDetailPage = () => {
       setError("");
       const data = await propertyService.getById(id);
       setProperty(data);
+      
+      // Load virtual tour if available
+      try {
+        const tourData = await propertyService.getVirtualTour(id);
+        setVirtualTour(tourData);
+      } catch (tourErr) {
+        // Virtual tour not available, continue without it
+        setVirtualTour(null);
+      }
       
       // Check if property is in favorites
       const favorite = await propertyService.isFavorite(id);
@@ -201,10 +211,18 @@ const PropertyDetailPage = () => {
                 className={`h-5 w-5 ${isFavorite ? "text-red-500 fill-current" : "text-gray-600"}`}
               />
             </Button>
-          </div>
+</div>
         </div>
       </div>
-
+      {/* Virtual Tour Section */}
+      {virtualTour && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-display font-semibold text-primary mb-4">
+            Virtual Tour
+          </h2>
+          <VirtualTourViewer tourData={virtualTour} className="w-full" />
+        </div>
+      )}
       {/* Property Details */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">

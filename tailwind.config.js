@@ -35,12 +35,31 @@ export default {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
-        slideUp: {
+slideUp: {
           "0%": { transform: "translateY(10px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
       },
+      backdropFilter: {
+        'none': 'none',
+        'blur': 'blur(8px)',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.hotspot-pulse': {
+          animation: 'pulse-ring 2s infinite',
+        },
+        '.virtual-tour-viewer': {
+          'user-select': 'none',
+          '-webkit-user-select': 'none',
+          '-moz-user-select': 'none',
+          '-ms-user-select': 'none',
+        },
+      };
+      addUtilities(newUtilities);
+    }
+  ],
 }

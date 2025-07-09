@@ -143,5 +143,56 @@ img {
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+100% { transform: rotate(360deg); }
+}
+
+/* Virtual Tour Styles */
+.hotspot-button {
+  position: absolute;
+  z-index: 10;
+  background: rgba(59, 130, 246, 0.9);
+  border-radius: 50%;
+  padding: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+.hotspot-button:hover {
+  background: rgba(59, 130, 246, 1);
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.hotspot-pulse {
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 360 Viewer Styles */
+.virtual-tour-viewer {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.virtual-tour-viewer img {
+  transition: transform 0.3s ease-out;
+}
+
+.virtual-tour-viewer.dragging img {
+  transition: none;
 }
