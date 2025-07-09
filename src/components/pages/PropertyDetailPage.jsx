@@ -138,7 +138,7 @@ const [favoriteLoading, setFavoriteLoading] = useState(false);
           Back
         </Button>
         <Badge variant="outline" size="medium">
-          {property.propertyType}
+{property.property_type}
         </Badge>
         <Badge variant="success" size="medium">
           {property.status}
@@ -156,7 +156,7 @@ const [favoriteLoading, setFavoriteLoading] = useState(false);
             </h1>
             <p className="text-gray-600 flex items-center mb-4">
               <ApperIcon name="MapPin" className="h-5 w-5 mr-2" />
-              {property.address}, {property.city}, {property.state} {property.zipCode}
+{property.address}, {property.city}, {property.state} {property.zip_code}
             </p>
             <div className="text-3xl font-bold text-accent gradient-text mb-4">
               {formatPrice(property.price)}
@@ -176,7 +176,7 @@ const [favoriteLoading, setFavoriteLoading] = useState(false);
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <ApperIcon name="Square" className="h-6 w-6 mx-auto mb-2 text-accent" />
-              <div className="text-xl font-bold text-gray-900">{property.squareFeet.toLocaleString()}</div>
+<div className="text-xl font-bold text-gray-900">{property.square_feet?.toLocaleString()}</div>
               <div className="text-sm text-gray-600">Sq Ft</div>
             </div>
           </div>
@@ -259,26 +259,26 @@ const [favoriteLoading, setFavoriteLoading] = useState(false);
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Property Type:</span>
-                <span className="font-medium">{property.propertyType}</span>
+<span className="font-medium">{property.property_type}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Year Built:</span>
-                <span className="font-medium">{property.yearBuilt}</span>
+<span className="font-medium">{property.year_built}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Square Feet:</span>
-                <span className="font-medium">{property.squareFeet.toLocaleString()}</span>
+<span className="font-medium">{property.square_feet?.toLocaleString()}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Price per Sq Ft:</span>
-                <span className="font-medium">
-                  ${Math.round(property.price / property.squareFeet).toLocaleString()}
+<span className="font-medium">
+                  ${Math.round(property.price / property.square_feet).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Listing Date:</span>
-                <span className="font-medium">
-                  {new Date(property.listingDate).toLocaleDateString()}
+<span className="font-medium">
+                  {new Date(property.listing_date).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">

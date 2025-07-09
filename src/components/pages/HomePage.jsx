@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import PropertyGrid from "@/components/organisms/PropertyGrid";
+import ApperIcon from "@/components/ApperIcon";
 import ComparisonTable from "@/components/organisms/ComparisonTable";
 import PropertyFilters from "@/components/organisms/PropertyFilters";
+import PropertyGrid from "@/components/organisms/PropertyGrid";
 import Button from "@/components/atoms/Button";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
 import { propertyService } from "@/services/api/propertyService";
 
 const HomePage = () => {
@@ -49,19 +49,29 @@ const calculateMortgage = () => {
     const schedule = [];
     let remainingBalance = principal;
     
-    for (let i = 1; i <= numPayments; i++) {
-      const interestPayment = remainingBalance * monthlyRate;
-      const principalPayment = monthlyPayment - interestPayment;
-      remainingBalance -= principalPayment;
+    for (let year = 1; year <= loanTerm; year++) {
+      let yearlyPrincipal = 0;
+      let yearlyInterest = 0;
       
-      if (i % 12 === 0) { // Show yearly data points
-        schedule.push({
-          year: i / 12,
-          principal: principal - remainingBalance,
-          interest: (monthlyPayment * i) - (principal - remainingBalance),
-          balance: Math.max(0, remainingBalance)
-        });
+      for (let month = 1; month <= 12; month++) {
+        const interestPayment = remainingBalance * monthlyRate;
+        const principalPayment = monthlyPayment - interestPayment;
+        
+        yearlyPrincipal += principalPayment;
+        yearlyInterest += interestPayment;
+        remainingBalance -= principalPayment;
+        
+        if (remainingBalance <= 0) break;
       }
+      
+      schedule.push({
+        year,
+        principal: yearlyPrincipal,
+        interest: yearlyInterest,
+        balance: Math.max(0, remainingBalance)
+      });
+      
+      if (remainingBalance <= 0) break;
     }
     
     setCalculatorResults({

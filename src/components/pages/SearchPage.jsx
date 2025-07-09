@@ -48,20 +48,20 @@ const SearchPage = () => {
 
   const handleSort = (sortType) => {
     setSortBy(sortType);
-    const sorted = [...properties].sort((a, b) => {
+const sorted = [...properties].sort((a, b) => {
       switch (sortType) {
         case "price-low":
           return a.price - b.price;
         case "price-high":
           return b.price - a.price;
         case "newest":
-          return new Date(b.listingDate) - new Date(a.listingDate);
+          return new Date(b.listing_date) - new Date(a.listing_date);
         case "oldest":
-          return new Date(a.listingDate) - new Date(b.listingDate);
+          return new Date(a.listing_date) - new Date(b.listing_date);
         case "sqft-large":
-          return b.squareFeet - a.squareFeet;
+          return b.square_feet - a.square_feet;
         case "sqft-small":
-          return a.squareFeet - b.squareFeet;
+          return a.square_feet - b.square_feet;
         default:
           return 0;
       }

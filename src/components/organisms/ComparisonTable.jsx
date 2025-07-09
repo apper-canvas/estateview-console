@@ -69,7 +69,7 @@ const ComparisonTable = ({ properties, onRemove, className }) => {
               </div>
               <div>
                 <span className="text-gray-500">Type:</span>
-                <div><Badge variant="outline" size="small">{property.propertyType}</Badge></div>
+<div><Badge variant="outline" size="small">{property.property_type}</Badge></div>
               </div>
               <div>
                 <span className="text-gray-500">Bedrooms:</span>
@@ -88,13 +88,13 @@ const ComparisonTable = ({ properties, onRemove, className }) => {
               <div>
                 <span className="text-gray-500">Square Feet:</span>
                 <div className="flex items-center">
-                  <ApperIcon name="Square" className="h-4 w-4 mr-1" />
-                  {property.squareFeet.toLocaleString()}
+<ApperIcon name="Square" className="h-4 w-4 mr-1" />
+                  {property.square_feet?.toLocaleString()}
                 </div>
               </div>
               <div>
                 <span className="text-gray-500">Year Built:</span>
-                <div>{property.yearBuilt}</div>
+<div>{property.year_built}</div>
               </div>
             </div>
             
@@ -102,7 +102,7 @@ const ComparisonTable = ({ properties, onRemove, className }) => {
               <span className="text-gray-500 text-sm">Location:</span>
               <div className="flex items-center text-sm">
                 <ApperIcon name="MapPin" className="h-4 w-4 mr-1" />
-                {property.address}, {property.city}, {property.state}
+{property.address}, {property.city}, {property.state}
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ const ComparisonTable = ({ properties, onRemove, className }) => {
               <td className="py-4 px-2 text-sm font-medium text-gray-500">Type</td>
               {properties.map((property) => (
                 <td key={property.Id} className="py-4 px-2">
-                  <Badge variant="outline" size="small">{property.propertyType}</Badge>
+<Badge variant="outline" size="small">{property.property_type}</Badge>
                 </td>
               ))}
             </tr>
@@ -187,8 +187,8 @@ const ComparisonTable = ({ properties, onRemove, className }) => {
               {properties.map((property) => (
                 <td key={property.Id} className="py-4 px-2">
                   <div className="flex items-center text-sm">
-                    <ApperIcon name="Square" className="h-4 w-4 mr-1" />
-                    {property.squareFeet.toLocaleString()}
+<ApperIcon name="Square" className="h-4 w-4 mr-1" />
+                    {property.square_feet?.toLocaleString()}
                   </div>
                 </td>
               ))}
@@ -198,7 +198,7 @@ const ComparisonTable = ({ properties, onRemove, className }) => {
               <td className="py-4 px-2 text-sm font-medium text-gray-500">Year Built</td>
               {properties.map((property) => (
                 <td key={property.Id} className="py-4 px-2">
-                  <span className="text-sm">{property.yearBuilt}</span>
+<span className="text-sm">{property.year_built}</span>
                 </td>
               ))}
             </tr>
