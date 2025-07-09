@@ -20,7 +20,60 @@ const HomePage = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [comparisonIds, setComparisonIds] = useState([]);
   const [comparisonProperties, setComparisonProperties] = useState([]);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorData, setCalculatorData] = useState({
+    loanAmount: 500000,
+    downPayment: 100000,
+    interestRate: 6.5,
+    loanTerm: 30
+  });
+  const [calculatorResults, setCalculatorResults] = useState(null);
   const navigate = useNavigate();
+
+const calculateMortgage = () => {
+    const { loanAmount, downPayment, interestRate, loanTerm } = calculatorData;
+    const principal = loanAmount - downPayment;
+    const monthlyRate = interestRate / 100 / 12;
+    const numPayments = loanTerm * 12;
+    
+    if (principal <= 0) {
+      toast.error("Loan amount must be greater than down payment");
+      return;
+    }
+    
+    const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+    const totalPayment = monthlyPayment * numPayments;
+    const totalInterest = totalPayment - principal;
+    
+    // Generate amortization schedule for chart
+    const schedule = [];
+    let remainingBalance = principal;
+    
+    for (let i = 1; i <= numPayments; i++) {
+      const interestPayment = remainingBalance * monthlyRate;
+      const principalPayment = monthlyPayment - interestPayment;
+      remainingBalance -= principalPayment;
+      
+      if (i % 12 === 0) { // Show yearly data points
+        schedule.push({
+          year: i / 12,
+          principal: principal - remainingBalance,
+          interest: (monthlyPayment * i) - (principal - remainingBalance),
+          balance: Math.max(0, remainingBalance)
+        });
+      }
+    }
+    
+    setCalculatorResults({
+      monthlyPayment,
+      totalPayment,
+      totalInterest,
+      principal,
+      schedule
+    });
+    
+    toast.success("Mortgage calculation completed successfully");
+  };
 
   const loadProperties = async () => {
     try {
@@ -139,6 +192,157 @@ return (
         </p>
       </div>
 
+      {/* Mortgage Calculator Widget */}
+      <div className="mb-8 bg-white rounded-lg shadow-card overflow-hidden">
+        <div 
+          className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setShowCalculator(!showCalculator)}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-display font-semibold text-primary mb-1">
+                Mortgage Calculator
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Calculate your monthly payments and view amortization schedule
+              </p>
+            </div>
+            <ApperIcon 
+              name={showCalculator ? "ChevronUp" : "ChevronDown"} 
+              className="h-6 w-6 text-gray-400"
+            />
+          </div>
+        </div>
+        
+        {showCalculator && (
+          <div className="border-t border-gray-200 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Loan Amount
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    value={calculatorData.loanAmount}
+                    onChange={(e) => setCalculatorData(prev => ({ ...prev, loanAmount: Number(e.target.value) }))}
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    placeholder="500000"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Down Payment
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    value={calculatorData.downPayment}
+                    onChange={(e) => setCalculatorData(prev => ({ ...prev, downPayment: Number(e.target.value) }))}
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    placeholder="100000"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Interest Rate
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={calculatorData.interestRate}
+                    onChange={(e) => setCalculatorData(prev => ({ ...prev, interestRate: Number(e.target.value) }))}
+                    className="w-full pr-8 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    placeholder="6.5"
+                  />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Loan Term
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={calculatorData.loanTerm}
+                    onChange={(e) => setCalculatorData(prev => ({ ...prev, loanTerm: Number(e.target.value) }))}
+                    className="w-full pr-12 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    placeholder="30"
+                  />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">years</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center mb-6">
+              <Button onClick={calculateMortgage} className="px-8">
+                <ApperIcon name="Calculator" className="h-4 w-4 mr-2" />
+                Calculate Mortgage
+              </Button>
+            </div>
+            
+            {calculatorResults && (
+              <div className="border-t border-gray-200 pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-700 mb-1">Monthly Payment</h3>
+                    <p className="text-2xl font-bold text-primary">
+                      ${calculatorResults.monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                    </p>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-700 mb-1">Total Interest</h3>
+                    <p className="text-2xl font-bold text-success">
+                      ${calculatorResults.totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                    </p>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-700 mb-1">Total Cost</h3>
+                    <p className="text-2xl font-bold text-secondary">
+                      ${calculatorResults.totalPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment Breakdown</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-2">Year</th>
+                          <th className="text-right py-2">Principal Paid</th>
+                          <th className="text-right py-2">Interest Paid</th>
+                          <th className="text-right py-2">Remaining Balance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {calculatorResults.schedule.slice(0, 10).map((year, index) => (
+                          <tr key={index} className="border-b border-gray-100">
+                            <td className="py-2 font-medium">{year.year}</td>
+                            <td className="py-2 text-right">${year.principal.toLocaleString('en-US', { maximumFractionDigits: 0 })}</td>
+                            <td className="py-2 text-right">${year.interest.toLocaleString('en-US', { maximumFractionDigits: 0 })}</td>
+                            <td className="py-2 text-right">${year.balance.toLocaleString('en-US', { maximumFractionDigits: 0 })}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <ComparisonTable 
         properties={comparisonProperties}
         onRemove={handleRemoveFromComparison}
